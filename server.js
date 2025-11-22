@@ -7,7 +7,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://ai-chatbot-nu-rose-66.vercel.app/",
+    origin: "https://ai-chatbot-nu-rose-66.vercel.app",
     methods: ["GET", "POST"],
   })
 );
@@ -26,7 +26,7 @@ const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://ai-chatbot-nu-rose-66.vercel.app/",
+    origin: "https://ai-chatbot-nu-rose-66.vercel.app",
     methods: ["GET", "POST"],
   },
 });
