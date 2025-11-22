@@ -4,10 +4,10 @@ const generateResponse = require("./services/ai.service");
 
 const app = express();
 
-// Allow frontend from Vite (http://localhost:5173)
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://ai-chatbot-nu-rose-66.vercel.app/",
     methods: ["GET", "POST"],
   })
 );
@@ -22,7 +22,7 @@ const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "https://ai-chatbot-nu-rose-66.vercel.app/",
     methods: ["GET", "POST"],
   },
 });
