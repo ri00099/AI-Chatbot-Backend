@@ -1,0 +1,75 @@
+const express = require("express");
+const cors = require("cors");
+const generateResponse = require("./services/ai.service");
+
+const app = express();
+
+// Allow frontend from Vite (http://localhost:5173)
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  })
+);
+
+app.use(express.json());
+
+// HTTP server + Socket.io
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+
+const httpServer = createServer(app);
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
+});
+
+const chatHistory = [];
+
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  socket.on("message", () => {
+    console.log("Message received from client");
+  });
+
+  socket.on("ai-res", async (data) => {
+    try {
+      console.log("User message:", data);
+
+      // Push user query
+      chatHistory.push({
+        role: "user",
+        parts: [{ text: data }],
+      });
+
+      // Generate reply
+      const result = await generateResponse(chatHistory);
+
+      // Push model reply
+      chatHistory.push({
+        role: "model",
+        parts: [{ text: result }],
+      });
+
+      console.log("AI Response:", result);
+
+      // Emit response back to frontend
+      socket.emit("ai-response", { result });
+    } catch (error) {
+      console.error("AI ERROR:", error.message);
+      socket.emit("ai-error", { error: error.message });
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
+
+httpServer.listen(3000, () => {
+  console.log("Server running at http://localhost:3000");
+});
